@@ -38,14 +38,38 @@ To use  this gem you need to include a simple markup on your website:
 <script type='text/thema'>[{"id":5,"code":"A","name":"Sztuka","remarks":"","children":[{"id":6,"code":"AB","name":"Sztuka – zagadnienia ogólne","remarks":""...</script>
 ```
 
-The div with id `thema-browser` mark a place where the editor should be placed. And the thema categories will be imported from `script` with `type='text/thema'`. I should be json
+The div with id `thema-browser` mark a place where the editor should be placed. It should also have two `data-*` fields: `data-fieldname`, which is the name of the field which will be send to the browser, and `data-persisted`, which is the current value. For new records is should be `[]`
+
+Let's assume, whe have three models, `Product`, `ThemaCategory` and `ProductThemaCategory` (with fields `product_id` and `thema_category_id`)
+
+In `product.rb` we add:
+
+```ruby
+  accepts_nested_attributes_for :product_thema_categories, :allow_destroy => true, :reject_if => :all_blank
+```
+Then the value of `data-fieldname` is `product[product_thema_categories_attributes]` and for `data-persisted`
+
+```ruby
+product_thema_categories.map { |c| { id: c.id, code: c.thema_category.code } }.to_json
+```
+Please remember add a line to strong params, for example:
+
+```ruby
+ product_thema_categories_attributes: [:id, :_destroy, :thema_category_id]
+```
+
+
+
+The thema categories will be imported from `script` with `type='text/thema'`. I should be json
 with the list of categories, where each category is a hash with following keys:
 
   - `id`: numerical category id from the database
   - `code`: thema code
   - `name`: category name
   - `remarks`: comments to the categories
-  - `children: list of children categories
+  - `children`: list of children categories
+
+
 
 You can also use a gem [elibri_thema](https://github.com/elibri/elibri_thema) for parsing xml with thema categories.
 
