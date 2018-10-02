@@ -1,0 +1,169 @@
+#nothing-found, #no-choosen-categories {
+  margin-top: 10px;
+  font-size: 14px;
+}
+
+#choosen-categories-label {
+  margin-bottom: 10px;
+  font-size: 20px;
+  color: #8eaa42;
+}
+
+#choosen-categories {
+  width: 100%;
+  margin: 0;
+  margin-top: 10px;
+  margin-bottom: 20px;
+  border-collapse: collapse;
+  font-size: 14px;
+
+  tr:nth-child(even) { background:  lighten(#8eaa42, 60); }
+  tr:nth-child(odd) { background: lighten(#8eaa42, 40); }
+
+  tr {
+    td:nth-child(1) {
+      width: 15%;
+    }
+    td:nth-child(3) {
+      width: 20px;
+    }
+
+    td {
+      line-height: 18px;
+      padding: 9px 12px 9px 12px;
+    }
+  }
+}
+
+a.undo {
+  text-decoration: none;
+  span  {
+    font-size: 20px;
+  }
+
+  svg {
+    width: 20px;
+  }
+
+  &:hover {
+    text-decoration: underline;
+  }
+
+  &.disabled {
+    color: #aaa;
+  }
+
+  &.disabled:hover {
+    text-decoration: none;
+  }
+
+
+}
+
+table.thema_categories { 
+  width: 100%; 
+  margin: 0; 
+  margin-top: 10px;
+  margin-bottom: 20px; 
+  border-collapse: collapse;
+  font-size: 14px;
+
+  tr.even { background:  lighten(#8eaa42, 60); }
+  tr.odd { background: lighten(#8eaa42, 40); }
+
+  td {
+    .remarks {
+       padding-left: 5px;
+       font-size: 12px;
+       font-style: italic;
+    }
+
+    line-height: 18px;
+    padding: 9px 12px 9px 12px;
+
+    div.state {
+      display: inline-block;
+      width: 15px;
+      font-size: 22px;
+      vertical-align: top;
+    }
+
+    div.collapsed::before {
+      content: "+";
+    }
+
+    div.expanded::before {
+      content: "-";
+    }
+
+  }
+
+  td.code {
+    width: 20%;
+    white-space:nowrap; 
+  }
+
+  tr.root {
+    td {
+      cursor: pointer;
+      font-weight: bold;
+    }
+  }
+
+  tr.active, tr.term-found {
+    td {
+      font-weight: bold;
+    }
+  }
+
+  .haschildren {
+    cursor: pointer;
+  }
+
+  td.level1 {
+    padding-left: 15px;
+  }
+
+  td.level2 {
+    padding-left: 30px;
+  }
+
+  td.level3 {
+    padding-left: 45px;
+  }
+
+  td.level4 {
+    padding-left: 60px;
+  }
+
+  td.level5 {
+    padding-left: 75px;
+  }
+
+  td.level6 {
+    padding-left: 90px;
+  }
+
+  td.level7 {
+    padding-left: 105px;
+  }
+
+  td.level8 {
+    padding-left: 120px;
+  }
+
+  td.level9 {
+    padding-left: 135px;
+  }
+
+  td.level10 {
+    padding-left: 150px;
+  }
+
+  tbody th {
+    font-weight: bold; 
+    white-space: nowrap; 
+    color: #666666;
+  }
+}
+
