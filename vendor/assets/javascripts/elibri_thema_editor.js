@@ -183,9 +183,7 @@ $(function() {
       codes.splice(idx, 1);
     }
 
-    $("[data-cat=" + code_to_remove + "]").find("img").attr("src", "/images/plus_alt.svg");
-
-
+    $("[data-cat=" + code_to_remove + "]").removeClass("minus-icon").addClass("plus-icon");
     build_choosen_cats_table();
   });
 
@@ -200,11 +198,10 @@ $(function() {
      if (idx > -1) {
        codes.splice(idx, 1);
      } 
-     $(this).find("img").attr("src", "/images/plus_alt.svg");
+     $(this).removeClass("minus-icon").addClass("plus-icon");
     } else {
-      codes.push(code);
-      $(this).find("img").attr("src", "/images/minus_alt.svg");
-
+     codes.push(code);
+     $(this).removeClass("plus-icon").addClass("minus-icon");
     }
 
     build_choosen_cats_table();
@@ -221,7 +218,7 @@ $(function() {
       var trs = [];
       $(codes).each(function(idx, code) {
         var full_name = $("#thema-browser").data("all_codes")[code].join(" / ");
-        var remove_link = "<a data-cat='" +  code + "' href='#' title='usuń kategorię'><img src='/images/minus_alt.svg' style='width: 15px;'/></a>";
+        var remove_link = "<a data-cat='" +  code + "' href='#' title='usuń kategorię' class='minus-icon'></a>";
         trs.push("<tr><td>" + code + "</td><td>" + full_name + "</td><td>" + remove_link + "</td></tr>");
       });
       $("#no-choosen-categories").hide();
@@ -291,7 +288,7 @@ $(function() {
       var operations = "";
       if ($("#thema-browser").data("fieldname")) {
         if (category.code.length > 1) {
-          operations = "<td style='width: 20px'><a data-cat='" + category.code + "'href='#' title='wybierz kategorię'><img src='/images/plus_alt.svg' width='15'/></a></td>";
+          operations = "<td style='width: 20px'><a data-cat='" + category.code + "'href='#' title='wybierz kategorię' class='plus-icon'></a></td>";
         } else {
           operations = "<td style='width: 20px'></td>";
         }

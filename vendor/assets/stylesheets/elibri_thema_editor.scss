@@ -167,3 +167,23 @@ table.thema_categories {
   }
 }
 
+
+.plus-icon {
+  width: 15px;
+  height: 15px;
+  display: block;
+  background-image: image-url("plus_alt.svg");
+  background-size: cover; 
+  background-position: center; 
+  background-repeat: no-repeat;
+}
+
+.minus-icon {
+  width: 15px;
+  height: 15px;
+  display: block;
+  background-image: image-url("minus_alt.svg");
+  background-size: cover; 
+  background-position: center;  
+  background-repeat: no-repeat;
+}
