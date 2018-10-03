@@ -289,8 +289,12 @@ $(function() {
       }
 
       var operations = "";
-      if ($("#thema-browser").data("fieldname") && category.code.length > 1) {
-        operations = "<td style='width: 20px'><a data-cat='" + category.code + "'href='#' title='wybierz kategorię'><img src='/images/plus_alt.svg' width='15'/></a></td>";
+      if ($("#thema-browser").data("fieldname")) {
+        if (category.code.length > 1) {
+          operations = "<td style='width: 20px'><a data-cat='" + category.code + "'href='#' title='wybierz kategorię'><img src='/images/plus_alt.svg' width='15'/></a></td>";
+        } else {
+          operations = "<td style='width: 20px'></td>";
+        }
       }
       
       html.push("<tr " + display + " data-parent='" + parent_code + "' data-code='" + category.code + "'>" + 
