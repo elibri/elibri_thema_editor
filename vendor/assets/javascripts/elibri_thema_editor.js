@@ -10,14 +10,28 @@ $(function() {
     colorize();
   }
 
+  var log_action = function(params) {
+    var log_url = $("#thema-browser").data("logurl");
+
+    if (log_url) {
+      $.post(log_url, JSON.stringify(params));
+    }
+  }
+
   var search_for_term = function(term) {
 
+    var original_term = term;
+    var logged = false;
+
     $("#nothing-found").hide();
+    
 
     term = term.toLowerCase().trim();
 
     if (term.length == 0) {
       //pokazuj główne kategorie
+      log_action({ action: "empty_search" });
+      logged = true;
       show_root_categories();
     } else {
 
@@ -27,6 +41,8 @@ $(function() {
       //istnieje taki kod
       if ($("#thema-browser").data("code_to_id_mapping")[term.toUpperCase()]) {
         codes.push(term.toUpperCase());
+        logged = true;
+        log_action({ action: "code_entered", code: term.toUpperCase() });
       } else {
 
         term = term.toLowerCase();
@@ -50,6 +66,10 @@ $(function() {
       $(".thema_categories tr").hide();
       $(".thema_categories .active").removeClass("active");
       $(".thema_categories .term-found").removeClass("term-found");
+
+      if (!logged) {
+        log_action({ action: "search", term: original_term, found: codes.length });
+      }
 
       if (codes.length > 0) {
 
@@ -80,12 +100,14 @@ $(function() {
   }
 
   var expand = function(code) {
+    log_action({ action: "expand", code: code });
     $("tr[data-code=" + code + "] .collapsed").removeClass("collapsed").addClass("expanded");
     $("[data-parent=" + code + "]").show();
     colorize();
   }
 
   var collapse = function(code) {
+    log_action({ action: "collapse", code: code });
     collapse_elem($("tr[data-code=" + code + "]"));
     colorize();
   }
@@ -168,7 +190,9 @@ $(function() {
 
   $(document).on("click", ".thema_categories a.search", function(e) {
     e.preventDefault();
-    open_category($(this).data("dest"));
+    var code = $(this).data("dest");
+    log_action({ action: "internal_link", code: code });
+    open_category(code);
   });
 
   //odznaczenie kategorii
@@ -184,10 +208,11 @@ $(function() {
     }
 
     $("[data-cat=" + code_to_remove + "]").removeClass("minus-icon").addClass("plus-icon");
+    log_action({ action: "deselect", code: code_to_remove });
     build_choosen_cats_table();
   });
 
-  //wybranie kategorii - kliknięcie na plusik przy kategorii
+  //wybranie/odznaczenie kategorii - kliknięcie na plusik/minusik przy kategorii
   $(document).on("click", ".thema_categories a[data-cat]", function(e) {
     e.preventDefault();
     var codes = $("#thema-browser").data("cats");
@@ -199,9 +224,11 @@ $(function() {
        codes.splice(idx, 1);
      } 
      $(this).removeClass("minus-icon").addClass("plus-icon");
+     log_action({ action: "deselect", code: code });
     } else {
      codes.push(code);
      $(this).removeClass("plus-icon").addClass("minus-icon");
+     log_action({ action: "select", code: code });
     }
 
     build_choosen_cats_table();
