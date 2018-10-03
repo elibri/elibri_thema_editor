@@ -110,6 +110,9 @@ $(function() {
     log_action({ action: "collapse", code: code });
     collapse_elem($("tr[data-code=" + code + "]"));
     colorize();
+    if ($(".thema_categories tr:visible").length == 1) { //po wyszukiwaniu został tylko jeden widoczny rząd, to wracamy do widoku podstawowego
+      show_root_categories();
+    }
   }
 
   var collapse_elem = function(elem) {
@@ -192,7 +195,8 @@ $(function() {
     e.preventDefault();
     var code = $(this).data("dest");
     log_action({ action: "internal_link", code: code });
-    open_category(code);
+    search_for_term(code);
+    $("#thema-search").val(code);
   });
 
   //odznaczenie kategorii
