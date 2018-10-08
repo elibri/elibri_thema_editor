@@ -265,25 +265,37 @@ $(function() {
     });
   }
 
-  var add_category_links = function(text, all_codes) {
+  var add_category_links = function(category_code, text, all_codes) {
     var regex = /\b[A-Z1-6][A-Z0-9\-]*\b/g;
-    var found = text.match(regex);
 
-    if (found) {
-      $(jQuery.unique(found)).each(function(idx, txt) {
+    //long string comes first
+    var found = jQuery.unique(text.match(regex) || []).sort(function(a, b) { return a.length < b.length });
+
+    //delete current code from code list, because I don't want to link to myself
+    var index = found.indexOf(category_code);
+    if (index > -1) {
+      found.splice(index, 1);
+    }
+
+    if (found.length > 0) {
+      $(found).each(function(idx, txt) {
         if (all_codes[txt]) {
           var title = all_codes[txt].join(" / ");
           if (text.indexOf(txt + "*") == -1) {
-            text = text.replace(new RegExp(txt, "g"), "<a href='#' class='search tooltip' title='" + title + "' data-dest='" + txt + "'>" + txt + "</a>");
+            //make sure, that replaced text isn't a link or data-dest attribute
+            text = text.replace(new RegExp("([^>'])" + txt, "g"), function(found) { 
+              var prefix = found.replace(txt, "");
+              return prefix + "<a href='#' class='search tooltip' title='" + title + "' data-dest='" + txt + "'>" + txt + "</a>";
+            });
           } else {
-            text = text.replace(new RegExp(txt + "\\*", "g"), "<a href='#' class='search tooltip' title='" + title + "' data-dest='" + txt + "'>" + txt + "*</a>");
+            text = text.replace(new RegExp("([^>'])" + txt + "\\*", "g"), function(found) { 
+              var prefix = found.replace(txt, "");
+              return prefix + "<a href='#' class='search tooltip' title='" + title + "' data-dest='" + txt + "'>" + txt + "*</a>";
+            });
           }
         }
       })
     }
-
-    var regex = /\b[A-Z1-6][A-Z\-]*\*/g;
-    var found = text.match(regex);
 
     return text;
   }
@@ -311,7 +323,7 @@ $(function() {
       }
 
       if (category.remarks && (category.remarks.length > 0)) {
-        remarks = "<div class='remarks'>" + add_category_links(escapeHtml(category.remarks), all_codes) + "</div>";
+        remarks = "<div class='remarks'>" + add_category_links(category.code, escapeHtml(category.remarks), all_codes) + "</div>";
       } else {
         remarks = "";
       }
