@@ -384,6 +384,8 @@ $(function() {
     html.push("</table>");
     
     if ($("#thema-browser").data("fieldname")) {
+
+      sort_icon = '<a href="#" id="sort-icon" title="sortuj kategorie" class="tooltip"> <svg style="height: 15px;" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512"><path fill="currentColor" d="M41 288h238c21.4 0 32.1 25.9 17 41L177 448c-9.4 9.4-24.6 9.4-33.9 0L24 329c-15.1-15.1-4.4-41 17-41zm255-105L177 64c-9.4-9.4-24.6-9.4-33.9 0L24 183c-15.1 15.1-4.4 41 17 41h238c21.4 0 32.1-25.9 17-41z" class=""></path></svg> </a> <a href="#" id="stop-sorting" style="display: none">zakończ sortowanie</a>';
       html.push("<div id='choosen-categories-label'>Wybrane kategorie:" + sort_icon + "</div><p style='display: none;' id='no-choosen-categories'>Nie została do tej pory wybrana żadna kategoria</p>");
       html.push("<ul id='choosen-categories' style='display: none;'></ul>")
     }
