@@ -199,61 +199,60 @@ $(function() {
     $("#thema-search").val(code);
   });
 
+
+  var select_category = function(code) {
+    var full_name = $("#thema-browser").data("all_codes")[code].join(" / ");
+    var remove_link = "<a data-cat='" +  code + "' href='#' title='usuń kategorię' class='minus-icon'></a>";
+    var html = "<li><span class='code'>" + code + "</span><span class='category-name'>" + full_name + "</span><span class='remove-icon'>" + remove_link + "</span></li>";
+    $("#no-choosen-categories").hide();
+    $("[data-cat=" + code + "]").removeClass("plus-icon").addClass("minus-icon");
+    $("#choosen-categories").show().append(html);
+    log_action({ action: "select", code: code });
+  }
+
+  var selected_categories_list = function() {
+    return $("#choosen-categories span.remove-icon a").map(function(_, e) { return $(e).data("cat"); }).get();
+  }
+
+  var unselect_category = function(code) {
+    $("#choosen-categories span.remove-icon a[data-cat='" + code + "']").parent().parent().remove();
+    if (selected_categories_list().length == 0) {
+      $("#choosen-categories").hide();
+      $("#no-choosen-categories").show();
+    }
+    //change minus icon to a plus icon in a category list
+    $("[data-cat=" + code + "]").removeClass("minus-icon").addClass("plus-icon");
+    log_action({ action: "deselect", code: code });
+  }
+
   //odznaczenie kategorii
   $(document).on("click", "#choosen-categories a[data-cat]", function(e) {
     e.preventDefault();
-    var codes = $("#thema-browser").data("cats");
-    var code_to_remove = $(this).data("cat");
-
-    //usuń ten kod z listy
-    var idx = codes.indexOf(code_to_remove);
-    if (idx > -1) {
-      codes.splice(idx, 1);
-    }
-
-    $("[data-cat=" + code_to_remove + "]").removeClass("minus-icon").addClass("plus-icon");
-    log_action({ action: "deselect", code: code_to_remove });
-    build_choosen_cats_table();
+    var code = $(this).data("cat");
+    unselect_category(code);
   });
 
   //wybranie/odznaczenie kategorii - kliknięcie na plusik/minusik przy kategorii
   $(document).on("click", ".thema_categories a[data-cat]", function(e) {
     e.preventDefault();
-    var codes = $("#thema-browser").data("cats");
     var code = $(this).data("cat");
-
-    if (codes.includes(code)) {
-     var idx = codes.indexOf(code);
-     if (idx > -1) {
-       codes.splice(idx, 1);
-     } 
-     $(this).removeClass("minus-icon").addClass("plus-icon");
-     log_action({ action: "deselect", code: code });
+    if (selected_categories_list().includes(code)) {
+      unselect_category(code);
     } else {
-     codes.push(code);
-     $(this).removeClass("plus-icon").addClass("minus-icon");
-     log_action({ action: "select", code: code });
-    }
-
-    build_choosen_cats_table();
-
+      select_category(code);
+    } 
   });
 
-  var build_choosen_cats_table = function() {
-    var codes = $("#thema-browser").data("cats");
+
+  var build_initial_choosen_cats_table = function() {
+    var codes = $("#thema-browser").data("persisted");
     if (codes.length == 0) {
       $("#choosen-categories").hide();
       $("#no-choosen-categories").show();
-
     } else {
-      var trs = [];
-      $(codes).each(function(idx, code) {
-        var full_name = $("#thema-browser").data("all_codes")[code].join(" / ");
-        var remove_link = "<a data-cat='" +  code + "' href='#' title='usuń kategorię' class='minus-icon'></a>";
-        trs.push("<li><span class='code'>" + code + "</span><span class='category-name'>" + full_name + "</span><span class='remove-icon'>" + remove_link + "</span></li>");
+      $(codes).each(function(_, code) {
+        select_category(code.code);
       });
-      $("#no-choosen-categories").hide();
-      $("#choosen-categories").html(trs.join("")).show();
     }
   }
 
@@ -357,13 +356,6 @@ $(function() {
 
   if ($("#thema-browser").length > 0) {
 
-    $("#thema-browser").data("cats", []);
-    if ($("#thema-browser").data("persisted")) {
-      $($("#thema-browser").data("persisted")).each(function(idx, c) {
-        $("#thema-browser").data("cats").push(c.code);
-      });
-    }
-
     var data = JSON.parse($("script[type='text/thema']").text());
 
     var code_to_id_mapping = {}
@@ -398,9 +390,6 @@ $(function() {
        $("#stop-sorting").hide();
        $("#choosen-categories").sortable("destroy");
        $(".minus-icon, .plus-icon").show();
-
-       var ordered_cats = $("#choosen-categories span.remove-icon a").map(function(_, e) { return $(e).data("cat"); }).get();
-       $("#thema-browser").data("cats", ordered_cats);
     });
 
     $("#sort-icon").on("click", function(e) {
@@ -414,7 +403,7 @@ $(function() {
     });
 
     colorize();
-    build_choosen_cats_table();
+    build_initial_choosen_cats_table();
 
     $(document).trigger("thema:loaded");
     $("#thema-search").show();
@@ -423,14 +412,13 @@ $(function() {
       //trzeba dołożyć odpowiednie inputy
       //najpierw iterujemy po wartościach, który przyszły z serwera. Jeśli któregoś już nie ma aktualnej liście, to dodaj pole _destroy
       var idx = 0;
-      var choosen_cats = $("#thema-browser").data("cats");
       var form = $("#thema-browser").parents("form");
       var fieldname = $("#thema-browser").data("fieldname");
       var code_to_id_mapping = $("#thema-browser").data("code_to_id_mapping");
 
       var persisted = $("#thema-browser").data("persisted");
 
-      $(choosen_cats).each(function(_, choosen_code) {
+      $(selected_categories_list()).each(function(_, choosen_code) {
          var code_id = code_to_id_mapping[choosen_code];
          form.append("<input type='hidden' name='" + fieldname + "[" + idx + "][thema_category_id]' value='" + code_id + "'/>");
 
