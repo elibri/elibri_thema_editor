@@ -250,7 +250,7 @@ $(function() {
       $(codes).each(function(idx, code) {
         var full_name = $("#thema-browser").data("all_codes")[code].join(" / ");
         var remove_link = "<a data-cat='" +  code + "' href='#' title='usuń kategorię' class='minus-icon'></a>";
-        trs.push("<tr><td>" + code + "</td><td>" + full_name + "</td><td>" + remove_link + "</td></tr>");
+        trs.push("<li><span class='code'>" + code + "</span><span class='category-name'>" + full_name + "</span><span class='remove-icon'>" + remove_link + "</span></li>");
       });
       $("#no-choosen-categories").hide();
       $("#choosen-categories").html(trs.join("")).show();
@@ -384,11 +384,32 @@ $(function() {
     html.push("</table>");
     
     if ($("#thema-browser").data("fieldname")) {
-      html.push("<div id='choosen-categories-label'>Wybrane kategorie:</div><p style='display: none;' id='no-choosen-categories'>Nie została do tej pory wybrana żadna kategoria</p>");
-      html.push("<table id='choosen-categories' style='display: none;'></table>")
+      html.push("<div id='choosen-categories-label'>Wybrane kategorie:" + sort_icon + "</div><p style='display: none;' id='no-choosen-categories'>Nie została do tej pory wybrana żadna kategoria</p>");
+      html.push("<ul id='choosen-categories' style='display: none;'></ul>")
     }
 
     $("#thema-browser").append(html.join(""));
+
+    $("#stop-sorting").on("click", function(e) {
+       e.preventDefault();
+       $("#sort-icon").show();
+       $("#stop-sorting").hide();
+       $("#choosen-categories").sortable("destroy");
+       $(".minus-icon, .plus-icon").show();
+
+       var ordered_cats = $("#choosen-categories span.remove-icon a").map(function(_, e) { return $(e).data("cat"); }).get();
+       $("#thema-browser").data("cats", ordered_cats);
+    });
+
+    $("#sort-icon").on("click", function(e) {
+      e.preventDefault();
+      $("#sort-icon").hide();
+      $("#stop-sorting").show();
+
+      $("#choosen-categories").sortable({ placeholder: "highlight", tolerance: 'pointer' });
+      $("#choosen-categories").disableSelection();
+      $(".minus-icon, .plus-icon").hide();
+    });
 
     colorize();
     build_choosen_cats_table();
@@ -405,23 +426,29 @@ $(function() {
       var fieldname = $("#thema-browser").data("fieldname");
       var code_to_id_mapping = $("#thema-browser").data("code_to_id_mapping");
 
-      $($("#thema-browser").data("persisted")).each(function(_, c) {
-         var code_id = code_to_id_mapping[c.code];
-         form.append("<input type='hidden' name='" + fieldname + "[" + idx + "][id]' value='" + c.id + "'/>");
+      var persisted = $("#thema-browser").data("persisted");
+
+      $(choosen_cats).each(function(_, choosen_code) {
+         var code_id = code_to_id_mapping[choosen_code];
          form.append("<input type='hidden' name='" + fieldname + "[" + idx + "][thema_category_id]' value='" + code_id + "'/>");
-         if (choosen_cats.includes(c.code)) {
-           choosen_cats.splice(choosen_cats.indexOf(c.code), 1);
-         } else {
-           form.append("<input type='hidden' name='" + fieldname + "[" + idx + "][_destroy]' value='true'/>");
+
+         var found = persisted.find(function(elem) { return elem.code == choosen_code })
+
+         if (found) { 
+           persisted.splice(persisted.indexOf(found), 1);
+           form.append("<input type='hidden' name='" + fieldname + "[" + idx + "][id]' value='" + found.id + "'/>");
          }
          idx = idx + 1;
       });
 
-      $(choosen_cats).each(function(_, code) {
-        var code_id = code_to_id_mapping[code];
+      //zostały jeszcze kody, które muszę wykasować z bazy
+      $(persisted).each(function(_, c) {
+        var code_id = code_to_id_mapping[c.code];
+ -      form.append("<input type='hidden' name='" + fieldname + "[" + idx + "][id]' value='" + c.id + "'/>");
         form.append("<input type='hidden' name='" + fieldname + "[" + idx + "][thema_category_id]' value='" + code_id + "'/>");
+        form.append("<input type='hidden' name='" + fieldname + "[" + idx + "][_destroy]' value='true'/>");
         idx = idx + 1;
-      });
+      })
     });
   }
 

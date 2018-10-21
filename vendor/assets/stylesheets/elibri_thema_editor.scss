@@ -3,10 +3,23 @@
   font-size: 14px;
 }
 
+#sort-icon {
+  text-decoration: none;
+}
+
+.ui-sortable {
+  cursor: grabbing;
+
+}
+
 #choosen-categories-label {
   margin-bottom: 10px;
   font-size: 20px;
   color: #8eaa42;
+
+  #stop-sorting {
+    font-size: 80%;
+  }   
 }
 
 #choosen-categories {
@@ -17,18 +30,30 @@
   border-collapse: collapse;
   font-size: 14px;
 
-  tr:nth-child(even) { background:  lighten(#8eaa42, 60); }
-  tr:nth-child(odd) { background: lighten(#8eaa42, 40); }
+  .highlight {
+     border: 1px solid #aaa;
+     height: 20px;
+  }
 
-  tr {
-    td:nth-child(1) {
+
+  li:nth-child(even) { background:  lighten(#8eaa42, 60); }
+  li:nth-child(odd) { background: lighten(#8eaa42, 40); }
+
+  li {
+    span:nth-child(1) {
       width: 15%;
     }
-    td:nth-child(3) {
-      width: 20px;
+
+    span:nth-child(2) {
+      width: 100%;
     }
 
-    td {
+    span:nth-child(3) {
+      width: 5%;
+    }
+
+    span {
+      display: table-cell;
       line-height: 18px;
       padding: 9px 12px 9px 12px;
     }
