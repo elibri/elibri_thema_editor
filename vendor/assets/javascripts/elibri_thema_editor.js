@@ -245,7 +245,7 @@ $(function() {
 
 
   var build_initial_choosen_cats_table = function() {
-    var codes = $("#thema-browser").data("persisted");
+    var codes = $("#thema-browser").data("persisted") || [];
     if (codes.length == 0) {
       $("#choosen-categories").hide();
       $("#no-choosen-categories").show();
