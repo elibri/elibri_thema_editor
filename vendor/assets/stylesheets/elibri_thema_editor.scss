@@ -97,6 +97,12 @@ table.thema_categories {
   tr.odd { background: lighten(#8eaa42, 40); }
 
   td {
+
+    &.op-icon {
+      padding-right: 0;
+      padding-left:  0;
+      width: 20px;
+    }
     .remarks {
        padding-left: 5px;
        font-size: 12px;
@@ -210,5 +216,25 @@ table.thema_categories {
   background-image: image-url("minus_alt.svg");
   background-size: cover; 
   background-position: center;  
+  background-repeat: no-repeat;
+}
+
+.empty-star-icon {
+  width: 15px;
+  height: 15px;
+  display: block;
+  background-image: image-url("empty_star.svg");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.full-star-icon {
+  width: 15px;
+  height: 15px;
+  display: block;
+  background-image: image-url("full_star.svg");
+  background-size: cover;
+  background-position: center;
   background-repeat: no-repeat;
 }

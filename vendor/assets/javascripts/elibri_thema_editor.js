@@ -210,6 +210,40 @@ $(function() {
     log_action({ action: "select", code: code });
   }
 
+  var get_starred_categories = function() {
+    var serialized_categories = localStorage.getItem("starred_thema_categories") || "[]";
+    return JSON.parse(serialized_categories);
+  }
+
+  var add_starred_category = function(code) {
+    var cats = get_starred_categories();
+    if (!cats.includes(code)) {
+      cats.push(code);
+      localStorage.setItem("starred_thema_categories", JSON.stringify(cats))
+    }
+  }
+
+  var remove_starred_category = function(code) {
+    var cats = get_starred_categories();
+    var index = cats.indexOf(code);
+    if (index > -1) {
+      cats.splice(index, 1);
+      localStorage.setItem("starred_thema_categories", JSON.stringify(cats))
+    }
+  }
+
+  $(document).on("click", ".empty-star-icon", function(e) {
+    e.preventDefault();
+    $(this).removeClass("empty-star-icon").addClass("full-star-icon");
+    add_starred_category($(this).data("starcat"));
+  });
+
+  $(document).on("click", ".full-star-icon", function(e) {
+    e.preventDefault();
+    $(this).removeClass("full-star-icon").addClass("empty-star-icon");
+    remove_starred_category($(this).data("starcat"));
+  });
+
   var selected_categories_list = function() {
     return $("#choosen-categories span.remove-icon a").map(function(_, e) { return $(e).data("cat"); }).get();
   }
@@ -300,7 +334,8 @@ $(function() {
   }
 
   //buduje drzewo kategorii na podstawie json-a z kategoriami
-  var build_tree = function(html, parent_code, categories, depth, all_codes) {
+  var build_tree = function(html, parent_code, categories, depth, all_codes, starred_categories) {
+
     $(categories).each(function(idx, category) {
       var display, code_classes, code, remarks, category_name;
       if (parent_code) {
@@ -328,18 +363,31 @@ $(function() {
       }
 
       var operations = "";
+
+      if (category.code.length > 1) {
+        if (starred_categories.includes(category.code)) {
+          var class_name = "full-star-icon";
+        } else {
+          var class_name = "empty-star-icon";
+
+        }
+        operations = operations + "<td class='op-icon'><a data-starcat='" + category.code + "'href='#' title='ulubiona kategoria?' class='" + class_name + "'></a></td>";
+      } else {
+        operations = operations + "<td class='op-icon'></td>";
+      }
+
       if ($("#thema-browser").data("fieldname")) {
         if (category.code.length > 1) {
-          operations = "<td style='width: 20px'><a data-cat='" + category.code + "'href='#' title='wybierz kategorię' class='plus-icon'></a></td>";
+          operations = operations + "<td class='op-icon'><a data-cat='" + category.code + "'href='#' title='wybierz kategorię' class='plus-icon'></a></td>";
         } else {
-          operations = "<td style='width: 20px'></td>";
+          operations = operations + "<td class='op-icon'></td>";
         }
       }
       
       html.push("<tr " + display + " data-parent='" + parent_code + "' data-code='" + category.code + "'>" + 
                  "<td class='" + code_classes + "'>" + code + "</td>" + 
                 "<td class='description level" + depth + "'>" + category_name + remarks + "</td>" + operations)
-      build_tree(html, category.code, category.children, depth + 1, all_codes);
+      build_tree(html, category.code, category.children, depth + 1, all_codes, get_starred_categories());
       html.push("</tr>");
     });
   }
