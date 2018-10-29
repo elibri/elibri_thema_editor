@@ -285,7 +285,7 @@ $(function() {
   });
 
   //wybranie/odznaczenie kategorii - kliknięcie na plusik/minusik przy kategorii
-  $(document).on("click", ".thema_categories a[data-cat]", function(e) {
+  $(document).on("click", ".thema_categories a[data-cat], #starred-categories a[data-cat]", function(e) {
     e.preventDefault();
     var code = $(this).data("cat");
     if (selected_categories_list().includes(code)) {
