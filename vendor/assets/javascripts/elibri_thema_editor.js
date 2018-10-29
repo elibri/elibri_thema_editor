@@ -216,31 +216,49 @@ $(function() {
   }
 
   var add_starred_category = function(code) {
+    $("[data-starcat='" + code + "']").removeClass("empty-star-icon").addClass("full-star-icon");
+
     var cats = get_starred_categories();
     if (!cats.includes(code)) {
       cats.push(code);
       localStorage.setItem("starred_thema_categories", JSON.stringify(cats))
+      log_action({ action: "starred", code: code });
     }
+
+    var full_name = $("#thema-browser").data("all_codes")[code].join(" / ");
+    if (selected_categories_list().includes(code)) {
+      var link = '<a data-cat="' + code + '" href="#" title="wybierz kategorię" class="minus-icon"></a>';
+    } else {
+      var link = '<a data-cat="' + code + '" href="#" title="wybierz kategorię" class="plus-icon"></a>';
+    }
+    var html = "<li data-starred='" +  code + "'><span class='code'>" + code + "</span><span class='category-name'>" + full_name + "</span><span><a data-starcat='" + code + "'href='#' title='usuń z ulubionych kategorii' class='full-star-icon'></a></span><span>" + link + "</span></li>";
+    $("#no-starred-categories").hide();
+    $("#starred-categories").show().append(html);
   }
 
   var remove_starred_category = function(code) {
+    $("[data-starcat='" + code + "']").removeClass("full-star-icon").addClass("empty-star-icon");
+    $("[data-starred='" + code + "']").remove();
+
     var cats = get_starred_categories();
     var index = cats.indexOf(code);
     if (index > -1) {
       cats.splice(index, 1);
       localStorage.setItem("starred_thema_categories", JSON.stringify(cats))
     }
+
+    if (cats.length == 0) {
+      $("#no-starred-categories").show();
+    }
   }
 
   $(document).on("click", ".empty-star-icon", function(e) {
     e.preventDefault();
-    $(this).removeClass("empty-star-icon").addClass("full-star-icon");
     add_starred_category($(this).data("starcat"));
   });
 
   $(document).on("click", ".full-star-icon", function(e) {
     e.preventDefault();
-    $(this).removeClass("full-star-icon").addClass("empty-star-icon");
     remove_starred_category($(this).data("starcat"));
   });
 
@@ -259,7 +277,7 @@ $(function() {
     log_action({ action: "deselect", code: code });
   }
 
-  //odznaczenie kategorii
+  //odznaczenie kategorii na liście zaznaczonych kategorii
   $(document).on("click", "#choosen-categories a[data-cat]", function(e) {
     e.preventDefault();
     var code = $(this).data("cat");
@@ -286,6 +304,18 @@ $(function() {
     } else {
       $(codes).each(function(_, code) {
         select_category(code.code);
+      });
+    }
+  }
+
+  var build_initial_starred_cats_table = function() {
+    var codes = get_starred_categories();
+    if (codes.length == 0) {
+      $("#starred-categories").hide();
+      $("#no-starred-categories").show();
+    } else {
+      $(codes).each(function(_, code) {
+        add_starred_category(code);
       });
     }
   }
@@ -424,7 +454,7 @@ $(function() {
 
     html.push("</table>");
 
-    $("#thema-browser").append('<div id="thema-tree">' + html.join("") + '</div><div id="thema-starred" style="display: none;">Tu jest lista ulubionych kategorii</div>');
+    $("#thema-browser").append('<div id="thema-tree">' + html.join("") + '</div><div id="thema-starred" style="display: none;"><ul id="starred-categories"></ul><p style="display: none;" id="no-starred-categories">Żadna kategoria nie została zaznaczona jako ulubiona. Proszę użyć ikony gwiazdy.</p></div>');
 
     
     if ($("#thema-browser").data("fieldname")) {
@@ -454,6 +484,7 @@ $(function() {
 
     colorize();
     build_initial_choosen_cats_table();
+    build_initial_starred_cats_table();
 
     $(document).trigger("thema:loaded");
     $("#thema-search").show();
