@@ -411,26 +411,28 @@ $(function() {
     $("#thema-browser").data("all_codes", all_codes);
     $("#thema-browser").data("code_to_id_mapping", code_to_id_mapping);
 
-    $("#thema-browser").prepend('<p id="nothing-found" style="display: none;">Przepraszamy, nie została znaleziona żadna kategoria</p>');
-    $("#thema-browser").prepend('<div style="clear: both"></div>');
-    $("#thema-browser").prepend('<div style="float: right;"><input autocomplete="off" class="searching" id="thema-search" name="thema-search" style="" type="text"><div>');
+    $("#thema-browser").append('<ul id="thema-tabs"><li class="thema-tab"><a class="thema-tab-link active" href="#" rel="thema-tree">drzewo kategorii</a></li><li class="thema-tab"><a class="thema-tab-link" href="#" rel="thema-starred">ulubione kategorie</a></li></ul>');
 
     var html = [];
 
+    html.push('<div style="float: right;"><input autocomplete="off" class="searching" id="thema-search" name="thema-search" style="" type="text"></div>');
+    html.push('<div style="clear: both"></div>');
+    html.push('<p id="nothing-found" style="display: none;">Przepraszamy, nie została znaleziona żadna kategoria</p>');
     html.push("<table class='thema_categories'>")
 
     build_tree(html, null, data, 0, all_codes); 
 
     html.push("</table>");
+
+    $("#thema-browser").append('<div id="thema-tree">' + html.join("") + '</div><div id="thema-starred" style="display: none;">Tu jest lista ulubionych kategorii</div>');
+
     
     if ($("#thema-browser").data("fieldname")) {
 
       sort_icon = '<a href="#" id="sort-icon" title="sortuj kategorie" class="tooltip"> <svg style="height: 15px;" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512"><path fill="currentColor" d="M41 288h238c21.4 0 32.1 25.9 17 41L177 448c-9.4 9.4-24.6 9.4-33.9 0L24 329c-15.1-15.1-4.4-41 17-41zm255-105L177 64c-9.4-9.4-24.6-9.4-33.9 0L24 183c-15.1 15.1-4.4 41 17 41h238c21.4 0 32.1-25.9 17-41z" class=""></path></svg> </a> <a href="#" id="stop-sorting" style="display: none">zakończ sortowanie</a>';
-      html.push("<div id='choosen-categories-label'>Wybrane kategorie:" + sort_icon + "</div><p style='display: none;' id='no-choosen-categories'>Nie została do tej pory wybrana żadna kategoria</p>");
-      html.push("<ul id='choosen-categories' style='display: none;'></ul>")
+      $("#thema-browser").append("<div id='choosen-categories-label'>Wybrane kategorie:" + sort_icon + "</div><p style='display: none;' id='no-choosen-categories'>Nie została do tej pory wybrana żadna kategoria</p>");
+      $("#thema-browser").append("<ul id='choosen-categories' style='display: none;'></ul>")
     }
-
-    $("#thema-browser").append(html.join(""));
 
     $("#stop-sorting").on("click", function(e) {
        e.preventDefault();
@@ -455,6 +457,24 @@ $(function() {
 
     $(document).trigger("thema:loaded");
     $("#thema-search").show();
+
+    $("a[rel=thema-tree]").on("click", function(e) {
+      e.preventDefault();
+      $(this).addClass("active");
+      $(this).blur();
+      $("a[rel=thema-starred]").removeClass("active");
+      $("#thema-tree").show();
+      $("#thema-starred").hide();
+    });
+
+    $("a[rel=thema-starred]").on("click", function(e) {
+      e.preventDefault();
+      $(this).addClass("active");
+      $(this).blur();
+      $("a[rel=thema-tree]").removeClass("active");
+      $("#thema-starred").show();
+      $("#thema-tree").hide();
+    });
 
     $("#thema-browser").parents("form").on("submit", function() {
       //trzeba dołożyć odpowiednie inputy

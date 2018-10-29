@@ -12,6 +12,9 @@
 
 }
 
+
+
+
 #choosen-categories-label {
   margin-bottom: 10px;
   font-size: 20px;
@@ -20,6 +23,16 @@
   #stop-sorting {
     font-size: 80%;
   }   
+}
+
+
+#thema-starred {
+  width: 100%;
+  margin: 0;
+  margin-top: 20px;
+  margin-bottom: 20px;
+  border-collapse: collapse;
+  font-size: 14px;
 }
 
 #choosen-categories {
@@ -237,4 +250,43 @@ table.thema_categories {
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
+}
+
+#thema-tabs {
+  border-bottom: 1px solid #dee2e6;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  padding-left: 0;
+  margin-bottom: 0;
+  list-style: none;
+  width: 60%;
+
+  .thema-tab {
+
+     margin-bottom: -1px;
+
+    .thema-tab-link {
+       border: 1px solid transparent;
+       border-top-left-radius: .25rem;
+       border-top-right-radius: .25rem;
+       display: block;
+       padding: .5rem 1rem;
+       text-decoration: none;
+       font-size: 14px;
+
+       &:hover {
+         border-color: #e9ecef #e9ecef #dee2e6;
+       }
+    }
+
+    .active {
+      color: #495057;
+      background-color: #fff;
+      border-color: #dee2e6 #dee2e6 #ffffff;
+      &:hover {
+        border-color: #dee2e6 #dee2e6 #ffffff;
+      }
+    }
+  }
 }
