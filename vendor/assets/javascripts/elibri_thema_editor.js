@@ -23,8 +23,13 @@ $(function() {
     var original_term = term;
     var logged = false;
 
+    var code_to_id_mapping = $("#thema-browser").data("code_to_id_mapping");
+
     $("#nothing-found").hide();
     
+    $(".thema_categories tr").hide();
+    $(".thema_categories .active").removeClass("active");
+    $(".thema_categories .term-found").removeClass("term-found");
 
     term = term.toLowerCase().trim();
 
@@ -39,7 +44,7 @@ $(function() {
 
       var codes = [];
       //istnieje taki kod
-      if ($("#thema-browser").data("code_to_id_mapping")[term.toUpperCase()]) {
+      if (code_to_id_mapping[term.toUpperCase()]) {
         codes.push(term.toUpperCase());
         logged = true;
         log_action({ action: "code_entered", code: term.toUpperCase() });
@@ -58,14 +63,14 @@ $(function() {
               var category_name = list[list.length-1].toLowerCase();
               if (category_name.indexOf(term) > -1) {
                 codes.push(code);
+                if (codes.length > 250) { //i tak nie sa sensu znajdować więcej, a bardzo to obciąża wydajność
+                  break;
+                }
               }
             }
           }
         }
       }
-      $(".thema_categories tr").hide();
-      $(".thema_categories .active").removeClass("active");
-      $(".thema_categories .term-found").removeClass("term-found");
 
       if (!logged) {
         log_action({ action: "search", term: original_term, found: codes.length });
@@ -74,22 +79,37 @@ $(function() {
       if (codes.length > 0) {
 
         $(codes).each(function(idx, code) {
-          var elem = $("tr[data-code=" + code + "]");
-          elem.addClass("term-found");
+          var elem = document.getElementById("catr" + code_to_id_mapping[code]);
+          elem.classList.add('term-found');
           while (true) {
-            elem.show().find(".collapsed").removeClass("collapsed").addClass("expanded");
-            var pcode = elem.data("parent");
-            if (pcode) {
-              elem =  $("tr[data-code=" + pcode + "]");
+            elem.style.display = "table-row"; 
+            var icon = elem.querySelector(".collapsed");
+            if (icon) {
+              icon.classList.remove("collapsed");
+              icon.classList.add("expanded");
+            }
+            var pcode = elem.getAttribute("data-parent");
+            if (pcode && pcode != "null") {
+              elem =  document.getElementById("catr" + code_to_id_mapping[pcode]);
             } else {
               break;
             }
           }
         })
+
         $(codes).each(function(idx, code) {
-          //rób plusy, jeśli nie widać kategorii podrzędnych
-           if ($("tr[data-parent=" + code + "]:visible").length == 0) {
-             $("tr[data-code=" + code + "] .expanded").removeClass("expanded").addClass("collapsed");
+           var nodes =  document.querySelectorAll('tr[data-parent="' + code + '"]');
+           for (var i = 0; i < nodes.length; i++) {
+             var node = nodes[i];
+             var visible = 0;
+             if (node.style.display != "none") {
+               visible++;
+               $("tr[data-code=" + code + "] .expanded").removeClass("expanded").addClass("collapsed");
+               break;
+             }
+             if (visible == 0) {
+              $("tr[data-code=" + code + "] .expanded").removeClass("expanded").addClass("collapsed");
+             }
            }
         });
         colorize();
@@ -182,7 +202,7 @@ $(function() {
   $(document).on("keypress", "#thema-search", function(e) {
      if (e.keyCode == 13) {
        e.preventDefault();
-       search_for_term($("#thema-search").val(), true);
+       search_for_term($("#thema-search").val());
      }
   });
 
@@ -322,10 +342,19 @@ $(function() {
 
   //dodawaj naprzemiennie klasy odd i even - żeby tabelka miała naprzemienne paski
   var colorize = function() {
-    $(".thema_categories tr:visible").each(function(idx, e) { 
-      var c = idx % 2 == 0 ? "even" : "odd";  
-      $(e).removeClass("even").removeClass("odd").addClass(c) 
-    });
+    var nodes = document.querySelectorAll(".thema_categories tr");
+    var idx = 0;
+    for (var i = 0; i < nodes.length; i++) {
+      var node = nodes[i];
+      if (node.style.display != "none") {
+        var c = idx % 2 == 0 ? "even" : "odd";
+        idx = idx + 1;
+        node.classList.remove("odd");
+        node.classList.remove("even");
+        node.classList.add(c);
+
+      }
+    }
   }
 
   var add_category_links = function(category_code, text, all_codes) {
@@ -364,7 +393,7 @@ $(function() {
   }
 
   //buduje drzewo kategorii na podstawie json-a z kategoriami
-  var build_tree = function(html, parent_code, categories, depth, all_codes, starred_categories) {
+  var build_tree = function(html, parent_code, categories, depth, all_codes, starred_categories, code_to_id_mapping) {
 
     $(categories).each(function(idx, category) {
       var display, code_classes, code, remarks, category_name;
@@ -413,11 +442,12 @@ $(function() {
           operations = operations + "<td class='op-icon'></td>";
         }
       }
-      
-      html.push("<tr " + display + " data-parent='" + parent_code + "' data-code='" + category.code + "'>" + 
+      var catid = code_to_id_mapping[category.code];
+
+      html.push("<tr " + display + "id='catr" + catid + "' data-parent='" + parent_code + "' data-code='" + category.code + "'>" + 
                  "<td class='" + code_classes + "'>" + code + "</td>" + 
                 "<td class='description level" + depth + "'>" + category_name + remarks + "</td>" + operations)
-      build_tree(html, category.code, category.children, depth + 1, all_codes, get_starred_categories());
+      build_tree(html, category.code, category.children, depth + 1, all_codes, starred_categories, code_to_id_mapping)
       html.push("</tr>");
     });
   }
@@ -450,7 +480,7 @@ $(function() {
     html.push('<p id="nothing-found" style="display: none;">Przepraszamy, nie została znaleziona żadna kategoria</p>');
     html.push("<table class='thema_categories'>")
 
-    build_tree(html, null, data, 0, all_codes); 
+    build_tree(html, null, data, 0, all_codes, get_starred_categories(), code_to_id_mapping); 
 
     html.push("</table>");
 
