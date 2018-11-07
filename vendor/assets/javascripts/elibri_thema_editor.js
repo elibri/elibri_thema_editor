@@ -1,5 +1,19 @@
 $(function() {
 
+
+  var category_can_be_selected = function(code) {
+    if (code.length == 1) {
+      return false;
+    } else if ((code.length == 2) && ((code[0] == "6") || (code[0] == "4"))) {
+      return false;
+    } else if (["XQ", "XA", "FY", "5A", "5H", "5J", "5L", "5P"].includes(code)) {
+      return false;
+    }
+
+    return true;
+  }
+
+
   //pokaż wszystkie kategorie najwyższego rzędu
   var show_root_categories = function() {
     $(".thema_categories .active").removeClass("active");
@@ -423,7 +437,7 @@ $(function() {
 
       var operations = "";
 
-      if (category.code.length > 1) {
+      if (category_can_be_selected(category.code)) {
         if (starred_categories.includes(category.code)) {
           var class_name = "full-star-icon";
         } else {
@@ -436,7 +450,7 @@ $(function() {
       }
 
       if ($("#thema-browser").data("fieldname")) {
-        if (category.code.length > 1) {
+        if (category_can_be_selected(category.code)) {
           operations = operations + "<td class='op-icon'><a data-cat='" + category.code + "'href='#' title='wybierz kategorię' class='plus-icon'></a></td>";
         } else {
           operations = operations + "<td class='op-icon'></td>";
