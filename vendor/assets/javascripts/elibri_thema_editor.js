@@ -4,12 +4,9 @@ $(function() {
   var category_can_be_selected = function(code) {
     if (code.length == 1) {
       return false;
-    } else if ((code.length == 2) && ((code[0] == "6") || (code[0] == "4"))) {
-      return false;
-    } else if (["XQ", "XA", "FY", "5A", "5H", "5J", "5L", "5P"].includes(code)) {
+    } else if (($("#thema-browser").data("blockedcodes") || []).includes(code)) {
       return false;
     }
-
     return true;
   }
 
