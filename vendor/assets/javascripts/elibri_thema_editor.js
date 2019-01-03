@@ -1,5 +1,4 @@
-$(function() {
-
+(function ($) {
 
   var category_can_be_selected = function(code) {
     if (code.length == 1) {
@@ -487,113 +486,117 @@ $(function() {
      return all_codes;
   }
 
-  if ($("#thema-browser").length > 0) {
 
-    var data = JSON.parse($("script[type='text/thema']").text());
+  $.fn.thema_browser = function() {
 
-    var code_to_id_mapping = {}
-    var all_codes = collect_all_codes(data, {}, [], code_to_id_mapping);
-    $("#thema-browser").data("all_codes", all_codes);
-    $("#thema-browser").data("code_to_id_mapping", code_to_id_mapping);
+    if ($("#thema-browser").length > 0) {
 
-    $("#thema-browser").append('<ul id="thema-tabs"><li class="thema-tab"><a class="thema-tab-link active" href="#" rel="thema-tree">drzewo kategorii</a></li><li class="thema-tab"><a class="thema-tab-link" href="#" rel="thema-starred">ulubione kategorie</a></li></ul>');
+      var data = JSON.parse($("script[type='text/thema']").text());
 
-    var html = [];
+      var code_to_id_mapping = {}
+      var all_codes = collect_all_codes(data, {}, [], code_to_id_mapping);
+      $("#thema-browser").data("all_codes", all_codes);
+      $("#thema-browser").data("code_to_id_mapping", code_to_id_mapping);
 
-    html.push('<div style="float: right;"><input autocomplete="off" class="searching" id="thema-search" name="thema-search" style="" type="text"></div>');
-    html.push('<div style="clear: both"></div>');
-    html.push('<p id="nothing-found" style="display: none;">Przepraszamy, nie została znaleziona żadna kategoria</p>');
-    html.push("<table class='thema_categories'>")
+      $("#thema-browser").append('<ul id="thema-tabs"><li class="thema-tab"><a class="thema-tab-link active" href="#" rel="thema-tree">drzewo kategorii</a></li><li class="thema-tab"><a class="thema-tab-link" href="#" rel="thema-starred">ulubione kategorie</a></li></ul>');
 
-    build_tree(html, null, data, 0, all_codes, get_starred_categories(), code_to_id_mapping); 
+      var html = [];
 
-    html.push("</table>");
+      html.push('<div style="float: right;"><input autocomplete="off" class="searching" id="thema-search" name="thema-search" style="" type="text"></div>');
+      html.push('<div style="clear: both"></div>');
+      html.push('<p id="nothing-found" style="display: none;">Przepraszamy, nie została znaleziona żadna kategoria</p>');
+      html.push("<table class='thema_categories'>")
 
-    $("#thema-browser").append('<div id="thema-tree">' + html.join("") + '</div><div id="thema-starred" style="display: none;"><ul id="starred-categories"></ul><p style="display: none;" id="no-starred-categories">Żadna kategoria nie została zaznaczona jako ulubiona. Proszę użyć ikony gwiazdy.</p></div>');
+      build_tree(html, null, data, 0, all_codes, get_starred_categories(), code_to_id_mapping); 
 
-    
-    if ($("#thema-browser").data("fieldname")) {
+      html.push("</table>");
 
-      sort_icon = '<a href="#" id="sort-icon" title="sortuj kategorie" class="tooltip"> <svg style="height: 15px;" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512"><path fill="currentColor" d="M41 288h238c21.4 0 32.1 25.9 17 41L177 448c-9.4 9.4-24.6 9.4-33.9 0L24 329c-15.1-15.1-4.4-41 17-41zm255-105L177 64c-9.4-9.4-24.6-9.4-33.9 0L24 183c-15.1 15.1-4.4 41 17 41h238c21.4 0 32.1-25.9 17-41z" class=""></path></svg> </a> <a href="#" id="stop-sorting" style="display: none">zakończ sortowanie</a>';
-      $("#thema-browser").append("<div id='choosen-categories-label'>Wybrane kategorie:" + sort_icon + "</div><p style='display: none;' id='no-choosen-categories'>Nie została do tej pory wybrana żadna kategoria</p>");
-      $("#thema-browser").append("<ul id='choosen-categories' style='display: none;'></ul>")
-    }
+      $("#thema-browser").append('<div id="thema-tree">' + html.join("") + '</div><div id="thema-starred" style="display: none;"><ul id="starred-categories"></ul><p style="display: none;" id="no-starred-categories">Żadna kategoria nie została zaznaczona jako ulubiona. Proszę użyć ikony gwiazdy.</p></div>');
 
-    $("#stop-sorting").on("click", function(e) {
-       e.preventDefault();
-       $("#sort-icon").show();
-       $("#stop-sorting").hide();
-       $("#choosen-categories").sortable("destroy");
-       $(".minus-icon, .plus-icon").show();
-    });
+      
+      if ($("#thema-browser").data("fieldname")) {
 
-    $("#sort-icon").on("click", function(e) {
-      e.preventDefault();
-      $("#sort-icon").hide();
-      $("#stop-sorting").show();
+        sort_icon = '<a href="#" id="sort-icon" title="sortuj kategorie" class="tooltip"> <svg style="height: 15px;" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512"><path fill="currentColor" d="M41 288h238c21.4 0 32.1 25.9 17 41L177 448c-9.4 9.4-24.6 9.4-33.9 0L24 329c-15.1-15.1-4.4-41 17-41zm255-105L177 64c-9.4-9.4-24.6-9.4-33.9 0L24 183c-15.1 15.1-4.4 41 17 41h238c21.4 0 32.1-25.9 17-41z" class=""></path></svg> </a> <a href="#" id="stop-sorting" style="display: none">zakończ sortowanie</a>';
+        $("#thema-browser").append("<div id='choosen-categories-label'>Wybrane kategorie:" + sort_icon + "</div><p style='display: none;' id='no-choosen-categories'>Nie została do tej pory wybrana żadna kategoria</p>");
+        $("#thema-browser").append("<ul id='choosen-categories' style='display: none;'></ul>")
+      }
 
-      $("#choosen-categories").sortable({ placeholder: "highlight", tolerance: 'pointer' });
-      $("#choosen-categories").disableSelection();
-      $(".minus-icon, .plus-icon").hide();
-    });
-
-    colorize();
-    build_initial_choosen_cats_table();
-    build_initial_starred_cats_table();
-
-    $(document).trigger("thema:loaded");
-    $("#thema-search").show();
-
-    $("a[rel=thema-tree]").on("click", function(e) {
-      e.preventDefault();
-      $(this).addClass("active");
-      $(this).blur();
-      $("a[rel=thema-starred]").removeClass("active");
-      $("#thema-tree").show();
-      $("#thema-starred").hide();
-    });
-
-    $("a[rel=thema-starred]").on("click", function(e) {
-      e.preventDefault();
-      $(this).addClass("active");
-      $(this).blur();
-      $("a[rel=thema-tree]").removeClass("active");
-      $("#thema-starred").show();
-      $("#thema-tree").hide();
-    });
-
-    $("#thema-browser").parents("form").on("submit", function() {
-      //trzeba dołożyć odpowiednie inputy
-      //najpierw iterujemy po wartościach, który przyszły z serwera. Jeśli któregoś już nie ma aktualnej liście, to dodaj pole _destroy
-      var idx = 0;
-      var form = $("#thema-browser").parents("form");
-      var fieldname = $("#thema-browser").data("fieldname");
-      var code_to_id_mapping = $("#thema-browser").data("code_to_id_mapping");
-
-      var persisted = $("#thema-browser").data("persisted");
-
-      $(selected_categories_list()).each(function(_, choosen_code) {
-         var code_id = code_to_id_mapping[choosen_code];
-         form.append("<input type='hidden' name='" + fieldname + "[" + idx + "][thema_category_id]' value='" + code_id + "'/>");
-
-         var found = persisted.find(function(elem) { return elem.code == choosen_code })
-
-         if (found) { 
-           persisted.splice(persisted.indexOf(found), 1);
-           form.append("<input type='hidden' name='" + fieldname + "[" + idx + "][id]' value='" + found.id + "'/>");
-         }
-         idx = idx + 1;
+      $("#stop-sorting").on("click", function(e) {
+         e.preventDefault();
+         $("#sort-icon").show();
+         $("#stop-sorting").hide();
+         $("#choosen-categories").sortable("destroy");
+         $(".minus-icon, .plus-icon").show();
       });
 
-      //zostały jeszcze kody, które muszę wykasować z bazy
-      $(persisted).each(function(_, c) {
-        var code_id = code_to_id_mapping[c.code];
- -      form.append("<input type='hidden' name='" + fieldname + "[" + idx + "][id]' value='" + c.id + "'/>");
-        form.append("<input type='hidden' name='" + fieldname + "[" + idx + "][thema_category_id]' value='" + code_id + "'/>");
-        form.append("<input type='hidden' name='" + fieldname + "[" + idx + "][_destroy]' value='true'/>");
-        idx = idx + 1;
-      })
-    });
+      $("#sort-icon").on("click", function(e) {
+        e.preventDefault();
+        $("#sort-icon").hide();
+        $("#stop-sorting").show();
+
+        $("#choosen-categories").sortable({ placeholder: "highlight", tolerance: 'pointer' });
+        $("#choosen-categories").disableSelection();
+        $(".minus-icon, .plus-icon").hide();
+      });
+
+      colorize();
+      build_initial_choosen_cats_table();
+      build_initial_starred_cats_table();
+
+      $(document).trigger("thema:loaded");
+      $("#thema-search").show();
+
+      $("a[rel=thema-tree]").on("click", function(e) {
+        e.preventDefault();
+        $(this).addClass("active");
+        $(this).blur();
+        $("a[rel=thema-starred]").removeClass("active");
+        $("#thema-tree").show();
+        $("#thema-starred").hide();
+      });
+
+      $("a[rel=thema-starred]").on("click", function(e) {
+        e.preventDefault();
+        $(this).addClass("active");
+        $(this).blur();
+        $("a[rel=thema-tree]").removeClass("active");
+        $("#thema-starred").show();
+        $("#thema-tree").hide();
+      });
+
+      $("#thema-browser").parents("form").on("submit", function() {
+        //trzeba dołożyć odpowiednie inputy
+        //najpierw iterujemy po wartościach, który przyszły z serwera. Jeśli któregoś już nie ma aktualnej liście, to dodaj pole _destroy
+        var idx = 0;
+        var form = $("#thema-browser").parents("form");
+        var fieldname = $("#thema-browser").data("fieldname");
+        var code_to_id_mapping = $("#thema-browser").data("code_to_id_mapping");
+
+        var persisted = $("#thema-browser").data("persisted");
+
+        $(selected_categories_list()).each(function(_, choosen_code) {
+           var code_id = code_to_id_mapping[choosen_code];
+           form.append("<input type='hidden' name='" + fieldname + "[" + idx + "][thema_category_id]' value='" + code_id + "'/>");
+
+           var found = persisted.find(function(elem) { return elem.code == choosen_code })
+
+           if (found) { 
+             persisted.splice(persisted.indexOf(found), 1);
+             form.append("<input type='hidden' name='" + fieldname + "[" + idx + "][id]' value='" + found.id + "'/>");
+           }
+           idx = idx + 1;
+        });
+
+        //zostały jeszcze kody, które muszę wykasować z bazy
+        $(persisted).each(function(_, c) {
+          var code_id = code_to_id_mapping[c.code];
+   -      form.append("<input type='hidden' name='" + fieldname + "[" + idx + "][id]' value='" + c.id + "'/>");
+          form.append("<input type='hidden' name='" + fieldname + "[" + idx + "][thema_category_id]' value='" + code_id + "'/>");
+          form.append("<input type='hidden' name='" + fieldname + "[" + idx + "][_destroy]' value='true'/>");
+          idx = idx + 1;
+        })
+      });
+    }
   }
 
-});
+}(jQuery));
