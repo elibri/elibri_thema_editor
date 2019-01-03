@@ -242,8 +242,13 @@ $(function() {
   }
 
   var get_starred_categories = function() {
-    var serialized_categories = localStorage.getItem("starred_thema_categories") || "[]";
-    return JSON.parse(serialized_categories);
+
+    if ($("#thema-browser").data("favcodes")) {
+      return $("#thema-browser").data("favcodes");
+    } else {
+      var serialized_categories = localStorage.getItem("starred_thema_categories") || "[]";
+      return JSON.parse(serialized_categories);
+    }
   }
 
   var add_starred_category = function(code) {
@@ -252,7 +257,11 @@ $(function() {
     var cats = get_starred_categories();
     if (!cats.includes(code)) {
       cats.push(code);
-      localStorage.setItem("starred_thema_categories", JSON.stringify(cats))
+      if ($("#thema-browser").data("favurl")) {
+        $.post($("#thema-browser").data("favurl"), { code: code, todo: 'add' })
+      } else {
+        localStorage.setItem("starred_thema_categories", JSON.stringify(cats));
+      }
       log_action({ action: "starred", code: code });
     }
 
@@ -275,7 +284,12 @@ $(function() {
     var index = cats.indexOf(code);
     if (index > -1) {
       cats.splice(index, 1);
-      localStorage.setItem("starred_thema_categories", JSON.stringify(cats))
+
+      if ($("#thema-browser").data("favurl")) {
+        $.post($("#thema-browser").data("favurl"), { code: code, todo: 'remove' })
+      } else {
+        localStorage.setItem("starred_thema_categories", JSON.stringify(cats));
+      }
     }
 
     if (cats.length == 0) {
