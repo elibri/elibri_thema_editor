@@ -172,6 +172,12 @@ table.thema_categories {
     line-height: 18px;
     padding: 9px 12px 9px 12px;
 
+    span.code {
+      padding: 0 0 0 0;
+      line-height: 20px;
+
+    } 
+
     div.state {
       display: inline-block;
       width: 15px;
@@ -181,10 +187,14 @@ table.thema_categories {
 
     div.collapsed::before {
       content: "+";
+      font-size: 18px;
+      line-height: 12px;
     }
 
     div.expanded::before {
       content: "-";
+      font-size: 18px;
+      line-height: 12px;
     }
 
   }
