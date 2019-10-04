@@ -230,14 +230,16 @@
   });
 
 
-  var select_category = function(code) {
+  var select_category = function(code, do_log_action) {
     var full_name = $("#thema-browser").data("all_codes")[code].join(" / ");
     var remove_link = "<a data-cat='" +  code + "' href='#' title='usuń kategorię' class='minus-icon'></a>";
     var html = "<li><span class='code'>" + code + "</span><span class='category-name'>" + full_name + "</span><span class='remove-icon'>" + remove_link + "</span></li>";
     $("#no-choosen-categories").hide();
     $("[data-cat=" + code + "]").removeClass("plus-icon").addClass("minus-icon");
     $("#choosen-categories").show().append(html);
-    log_action({ action: "select", code: code });
+    if (do_log_action) {
+      log_action({ action: "select", code: code });
+    }
   }
 
   var get_starred_categories = function() {
@@ -335,7 +337,7 @@
     if (selected_categories_list().includes(code)) {
       unselect_category(code);
     } else {
-      select_category(code);
+      select_category(code, true);
     } 
   });
 
@@ -347,7 +349,7 @@
       $("#no-choosen-categories").show();
     } else {
       $(codes).each(function(_, code) {
-        select_category(code.code);
+        select_category(code.code, false);
       });
     }
   }
@@ -498,7 +500,7 @@
       $("#thema-browser").data("all_codes", all_codes);
       $("#thema-browser").data("code_to_id_mapping", code_to_id_mapping);
 
-      $("#thema-browser").append('<ul id="thema-tabs"><li class="thema-tab"><a class="thema-tab-link active" href="#" rel="thema-tree">drzewo kategorii</a></li><li class="thema-tab"><a class="thema-tab-link" href="#" rel="thema-starred">ulubione kategorie</a></li></ul>');
+      $("#thema-browser").append('<ul id="thema-tabs"><li class="thema-tab"><a class="thema-tab-link active clear-search" href="#" rel="thema-tree">drzewo kategorii</a></li><li class="thema-tab"><a class="thema-tab-link" href="#" rel="thema-starred">ulubione kategorie</a></li></ul>');
 
       var html = [];
 
@@ -545,6 +547,17 @@
 
       $(document).trigger("thema:loaded");
       $("#thema-search").show();
+
+      if (window.location.hash.length > 0) {
+        var code = window.location.hash.replace("#", "");
+        search_for_term(code);
+        $("#thema-search").val(code);
+      }
+
+      $("a.clear-search").on("click", function() {
+         search_for_term("");
+        $("#thema-search").val("");
+      });
 
       $("a[rel=thema-tree]").on("click", function(e) {
         e.preventDefault();
